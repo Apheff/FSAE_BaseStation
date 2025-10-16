@@ -1,3 +1,3 @@
 # FSAE - Base Station
  This project is made for the student racing team to get and visualize the data from the reacing car such as: velocity, torque, gps data etc...
-![Logo UNIPG Racing team](imges/Logo.svg)
+![Logo UNIPG Racing team](Logo.svg)
