@@ -1,17 +1,15 @@
-import pyserial
-
+import serial as pyserial
 
 class Radio:
-    def __init__(self, COM, BAUDRATE = 9600, timeout = 3)
-        self.serial = pyserial.Serial(COM, BAUDRATE, timeout)
+    def __init__(self, COM, BAUDRATE = 9600):
+        self.serial = pyserial.Serial(COM, BAUDRATE)
     # serial connection initialization
     
-    def receive_message():
+    def receive_message(self):
         ''' Receives the data from the serial port '''
-        return str(self.serial.readline())
-        
-        
-    def wait_for_message(message):
+        return print(self.serial.readline())
+    
+    def wait_for_message(self, message):
         ''' Aspetta un determinato messaggio da Arduino '''
         input_message = ""
     
@@ -23,3 +21,4 @@ class Radio:
     
     def clean_string(msg):
         # TO-DO: implement the function to clean the receiving string from the radio
+        return msg
