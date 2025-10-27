@@ -1,43 +1,76 @@
-import serial as pyserial
-import serial.tools.list_ports as ports
-
-class Radio:
-    def __init__(self):
-        self.serial = None
-    # serial connection initialization
+    import serial as pyserial
+    import serial.tools.list_ports as ports
     
-    
-    def receive_message(self):
-        ''' Receives the data from the serial port '''
-        return Radio.clean_string(str(self.serial.readline()))
-    
-    
-    def wait_for_message(self, message):
-        ''' Aspetta un determinato messaggio da Arduino '''
-        input_message = ""
-    
-        while message not in input_message:
-            input_message = str(self.serial.readline())
+    class Radio:
         
-        return input_message
+        port = ""  # COM port variable
+        serial = None
+        baudrate = ""
     
-    
-    def list_available_ports():
-        ''' Lists all the available serial ports '''
-        s = []
-        for _ in ports.comports():
-            if ("n/a" not in _.description.lower()):
-                s += _
-        return s
+        def receive_message():
+            ''' Receives the data from the serial port '''
+            return Radio.clean_string(str(Radio.serial.readline()))
         
-
-    def init(self, COM, BAUDRATE = 9600):
-        ''' Initializes the serial connection '''
-        self.serial = pyserial.Serial(COM, BAUDRATE)
-        return self.serial.is_open
-
-
-    def clean_string(msg):
-        # TO-DO: implement the function to clean the receiving string from the radio
-        out = msg[2:][:-5]
-        return out
+        
+        def wait_for_message(message):
+            ''' Aspetta un determinato messaggio da Arduino '''
+            input_message = ""
+        
+            while message not in input_message:
+                input_message = str(Radio.serial.readline())
+            
+            return input_message
+        
+        
+        def list_available_ports():
+            ''' Lists all the available serial ports '''
+            s = []
+            for _ in ports.comports():
+                if ("n/a" not in _.description.lower()):
+                    s.append(f"{_.device} : {_.description}")
+            return s
+    
+        def init():
+            ''' Connect with comprehensive error handling '''
+            try:
+                Radio.serial = pyserial.Serial(Radio.port, Radio.baudrate, timeout=0)
+                return Radio.isActive()
+                
+            except Radio.serial.SerialException as e:
+                print(f"Serial port error: {e}")
+            except PermissionError:
+                print("Permission denied. Fix:")
+                print("  Linux: sudo usermod -a -G dialout $USER")
+                print("  Windows: Run as administrator")
+            except FileNotFoundError:
+                print("Port not found. Check:")
+                print("  - Device connected and powered")
+                print("  - Correct port name")
+                print("  - Driver installed")
+            
+            return None
+    
+        def isActive():
+            ''' Checks if the serial connection is active '''
+            return Radio.serial
+    
+        def setBaudrate(baudrate):
+            ''' Sets the baudrate for the serial connection '''
+            Radio.baudrate = baudrate
+        
+        def getBaudrate():
+            ''' Gets the baudrate for the serial connection '''
+            return Radio.baudrate
+    
+        def setCOM(port):
+            ''' Sets the COM port for the serial connection '''
+            Radio.port = port
+        
+        def getCOM():
+            ''' Gets the COM port for the serial connection '''
+            return Radio.port
+        
+        def clean_string(msg):
+            ''' Restituisce solo la parte utile di una stringaricevuta tramite connessione seriale '''
+            out = msg[2:][:-5]
+            return out
