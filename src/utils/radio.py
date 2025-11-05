@@ -3,9 +3,61 @@ import serial.tools.list_ports as ports
 from PyQt6.QtCore import QThread, pyqtSignal
 import serial
 import time
+import random
     
 class RadioWorker(QThread):
     
+#--------------------AGGIUNGO HASHMAP------------------#
+
+    essential_inf = {
+        
+        "velocity":0.0,
+        "gear":0,
+        "brake":0.0,
+        "throttle":0.0,
+        "pression oil":0.0,
+        "engine rpm":0.0,
+        "oil temperature":0.0,
+        "engine temperature":0.0,
+        "pression wheel":0.0,
+        "steering":0
+
+        }
+    
+    def telemetry_information(dati):
+        #simulazione
+        dati["velocity"] = round(random.uniform(0,150),1)
+        dati["gear"] = random.randint(0,6)
+        dati["brake"] = round(random.uniform(0,1),2)
+        dati["throttle"] = round(random.uniform(0,1),2)
+        dati["pression oil"] = round(random.uniform(0,100),1)
+        dati["engine rpm"] = random.randint(1000,12000)
+        dati["oil temperature"] = round(random.uniform(60,110),1)
+        dati["engine temperature"] = round(random.uniform(60,120),1)
+        dati["pression wheel"] = round(random.uniform(0,100),1)
+        dati["steering"] = random.randint(-100,100)
+        return dati
+    
+
+    def show_telemetry(dati):
+        print("======ENGINE DATES======")
+        for chiave, valore in dati.items():
+            print(f"{chiave.capitalize()}: {valore}")
+        print("========================\n")
+
+    while True:
+        essential_inf = telemetry_information(essential_inf)
+        show_telemetry(essential_inf)
+        time.sleep(1)
+
+    
+#---------------FINE IMPLEMENTAZIONE----------------#
+
+
+
+
+
+
     data_received = pyqtSignal(int)
 
     def __init__(self, baudrate=9600):
