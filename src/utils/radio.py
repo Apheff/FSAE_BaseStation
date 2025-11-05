@@ -6,55 +6,7 @@ import time
 import random #la importo per la "prova dell'hashmap"
     
 class RadioWorker(QThread):
-    
-#--------------------AGGIUNGO HASHMAP------------------#
-
-    essential_inf = {
-        
-        "velocity":0.0,
-        "gear":0,
-        "brake":0.0,
-        "throttle":0.0,
-        "pression oil":0.0,
-        "engine rpm":0.0,
-        "oil temperature":0.0,
-        "engine temperature":0.0,
-        "pression wheel":0.0,
-        "steering":0
-
-        }
-    
-    def telemetry_information(dati):
-        #simulazione
-        dati["velocity"] = round(random.uniform(0,150),1)
-        dati["gear"] = random.randint(0,6)
-        dati["brake"] = round(random.uniform(0,1),2)
-        dati["throttle"] = round(random.uniform(0,1),2)
-        dati["pression oil"] = round(random.uniform(0,100),1)
-        dati["engine rpm"] = random.randint(1000,12000)
-        dati["oil temperature"] = round(random.uniform(60,110),1)
-        dati["engine temperature"] = round(random.uniform(60,120),1)
-        dati["pression wheel"] = round(random.uniform(0,100),1)
-        dati["steering"] = random.randint(-100,100)
-        return dati
-    
-
-    def show_telemetry(dati):
-        print("======ENGINE DATES======")
-        for chiave, valore in dati.items():
-            print(f"{chiave.capitalize()}: {valore}")
-        print("========================\n")
-
-    while True:
-        essential_inf = telemetry_information(essential_inf)
-        show_telemetry(essential_inf)
-        time.sleep(1)
-
-    
-#---------------FINE IMPLEMENTAZIONE----------------#
-
-
-
+ 
 
 
 
@@ -177,3 +129,54 @@ class RadioWorker(QThread):
         ''' Restituisce solo la parte utile di una stringaricevuta tramite connessione seriale '''
         out = msg[2:][:-5]
         return out
+    
+    
+#--------------------AGGIUNGO HASHMAP------------------#
+    def __init__(self):
+        super().__init__()
+        self.dati = {
+
+            "velocity":0.0,
+            "gear":0,
+            "brake":0.0,
+            "throttle":0.0,
+            "pression oil":0.0,
+            "engine rpm":0.0,
+            "oil temperature":0.0,
+            "engine temperature":0.0,
+            "pression wheel":0.0,
+            "steering":0
+
+            }
+
+        def telemetry_information(dati, self):
+            #simulazione
+            self.dati["velocity"] = round(random.uniform(0,150),1)
+            self.dati["gear"] = random.randint(0,6)
+            self.dati["brake"] = round(random.uniform(0,1),2)
+            self.dati["throttle"] = round(random.uniform(0,1),2)
+            self.dati["pression oil"] = round(random.uniform(0,100),1)
+            self.dati["engine rpm"] = random.randint(1000,12000)
+            self.dati["oil temperature"] = round(random.uniform(60,110),1)
+            self.dati["engine temperature"] = round(random.uniform(60,120),1)
+            self.dati["pression wheel"] = round(random.uniform(0,100),1)
+            self.dati["steering"] = random.randint(-100,100)
+            return self.dati
+
+
+        def show_telemetry(dati, self):
+            print("======ENGINE DATES======")
+            for chiave, valore in self.dati.items():
+                print(f"{chiave.capitalize()}: {valore}")
+            print("========================\n")
+
+        while True:
+            essential_inf = telemetry_information(self.dati)
+            show_telemetry(self.dati)
+            time.sleep(1)
+            return dati 
+
+
+#---------------FINE IMPLEMENTAZIONE----------------#
+
+
