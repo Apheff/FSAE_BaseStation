@@ -3,7 +3,7 @@ import serial.tools.list_ports as ports
 from PyQt6.QtCore import QThread, pyqtSignal
 import serial
 import time
-import random
+import random #la importo per la "prova dell'hashmap"
     
 class RadioWorker(QThread):
     
