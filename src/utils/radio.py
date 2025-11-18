@@ -1,14 +1,10 @@
 import serial as pyserial
 import serial.tools.list_ports as ports
 from PyQt6.QtCore import QThread, pyqtSignal
-import serial
 import time
-import random #la importo per la "prova dell'hashmap"
+from serial import SerialException
     
 class RadioWorker(QThread):
- 
-
-
 
     data_received = pyqtSignal(int)
 
@@ -18,10 +14,11 @@ class RadioWorker(QThread):
         self.baudrate = baudrate
         self.running = False
         self.serial = None
+        self.queue = []
 
     def run(self):
         try:
-            self.serial = serial.Serial(self.port, self.baudrate, timeout=0.1)
+            self.serial = pyserial.Serial(self.port, self.baudrate, timeout=0.1)
         except Exception as e:
             print(f"Serial error: {e}")
             return
@@ -48,7 +45,7 @@ class RadioWorker(QThread):
 
     def receive_message(self):
         ''' Receives the data from the serial port '''
-        input_message = Radio.clean_string(str(self.serial.readline()))
+        input_message = self.serial.readline()
         
         if input_message != "":
             self.queue.append(input_message)
@@ -90,7 +87,7 @@ class RadioWorker(QThread):
             self.start()
             return self.serial
             
-        except self.serial.SerialException as e:
+        except SerialException as e:
             print(f"Serial port error: {e}")
         except PermissionError:
             print("Permission denied. Fix:")
@@ -129,54 +126,3 @@ class RadioWorker(QThread):
         ''' Restituisce solo la parte utile di una stringaricevuta tramite connessione seriale '''
         out = msg[2:][:-5]
         return out
-    
-    
-#--------------------AGGIUNGO HASHMAP------------------#
-    def __init__(self):
-        super().__init__()
-        self.dati = {
-
-            "velocity":0.0,
-            "gear":0,
-            "brake":0.0,
-            "throttle":0.0,
-            "pression oil":0.0,
-            "engine rpm":0.0,
-            "oil temperature":0.0,
-            "engine temperature":0.0,
-            "pression wheel":0.0,
-            "steering":0
-
-            }
-
-        def telemetry_information(dati, self):
-            #simulazione
-            self.dati["velocity"] = round(random.uniform(0,150),1)
-            self.dati["gear"] = random.randint(0,6)
-            self.dati["brake"] = round(random.uniform(0,1),2)
-            self.dati["throttle"] = round(random.uniform(0,1),2)
-            self.dati["pression oil"] = round(random.uniform(0,100),1)
-            self.dati["engine rpm"] = random.randint(1000,12000)
-            self.dati["oil temperature"] = round(random.uniform(60,110),1)
-            self.dati["engine temperature"] = round(random.uniform(60,120),1)
-            self.dati["pression wheel"] = round(random.uniform(0,100),1)
-            self.dati["steering"] = random.randint(-100,100)
-            return self.dati
-
-
-        def show_telemetry(dati, self):
-            print("======ENGINE DATES======")
-            for chiave, valore in self.dati.items():
-                print(f"{chiave.capitalize()}: {valore}")
-            print("========================\n")
-
-        while True:
-            essential_inf = telemetry_information(self.dati)
-            show_telemetry(self.dati)
-            time.sleep(1)
-            return dati 
-
-
-#---------------FINE IMPLEMENTAZIONE----------------#
-
-
