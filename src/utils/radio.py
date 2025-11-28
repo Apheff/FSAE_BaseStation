@@ -3,20 +3,39 @@ import serial.tools.list_ports as ports
 from PyQt6.QtCore import QThread, pyqtSignal
 import time
 from serial import SerialException
+
     
 class RadioWorker(QThread):
 
-    data_received = pyqtSignal(int)
-
-    def __init__(self, baudrate=9600):
+    data_received = pyqtSignal(str, str)
+    
+    def __init__(self, baudrate=115200  ):
+        ''' initialization of the RadioWorker thread '''
         super().__init__()
         self.port = None
         self.baudrate = baudrate
         self.running = False
         self.serial = None
-        self.queue = []
-
+        
+        # Dictionary to store telemetry data (and pass it to the main window set function via signal)
+        self.info = {
+            "ST": "",
+            "TP": "",   
+            "BS": "",
+            "M" : "",
+            "CS": "",
+            "OT": "",
+            "WT": "",
+            "RPM": "",
+            "OP": "",
+            "SS": "",
+        }
+        self.start()
+        #end of __init__ function
+        
+        
     def run(self):
+        ''' Main thread loop to read data from the serial port '''
         try:
             self.serial = pyserial.Serial(self.port, self.baudrate, timeout=0.1)
         except Exception as e:
@@ -25,51 +44,40 @@ class RadioWorker(QThread):
 
         while self.running:
             try:
-                if self.serial.in_waiting:
-                    msg = self.serial.readline().decode(errors="ignore").strip()
-                    if msg.isdigit():
-                        self.data_received.emit(int(msg))
+                if self.serial:
+                    msg = self.serial.readline().decode('utf-8').strip()
+                    
+                    # Parsing the message (the format here is <key1>:<value1>,<key2>:<value2>,...)
+                    for part in msg.split(","):
+                        # splitting key and value
+                        if ":" in part:
+                            key, value = part.split(":", 1)
+                            
+                            # updating the info dictionary
+                            self.info[key] = value
+                            
+                    for key, value in self.info.items():
+                        self.data_received.emit(key, value)
                 time.sleep(0.05)  # Small delay to prevent CPU overload
             except Exception as e:
-                print(f"Error in RadioWorker: {e}")
+                print(f"/!\\ Error in RadioWorker: {e}")
                 break
-                
+    # end of run function
     
-    def start(self):
-        self.running = True
-        super().start()
-
-    def stop(self):
-        self.running = False
-        self.wait()
-
-    def receive_message(self):
-        ''' Receives the data from the serial port '''
-        input_message = self.serial.readline()
-        
-        if input_message != "":
-            self.queue.append(input_message)
-            
-    def read_message(self):
-        ''' Reads the oldest message from the queue '''
-        if len(self.queue) > 0:
-            return self.queue.pop(0)
-        else:
-            return None
-            
-    def canRead(self):
-        ''' Checks if there are messages in the queue '''
-        return len(self.queue) > 0
-    
-    
+     
     def wait_for_message(self, message):
-        ''' Aspetta un determinato messaggio da Arduino '''
+        ''' waiting for a specific massage sent by the radio module '''
+        if(not self.serial):
+            return
+        
         input_message = ""
     
         while message not in input_message:
             input_message = str(self.serial.readline())
         
         return input_message
+    # end of wait_for_message function
+
 
     
     def list_available_ports(self):
@@ -79,6 +87,7 @@ class RadioWorker(QThread):
             if ("n/a" not in _.description.lower()):
                 s.append(f"{_.device} : {_.description}")
         return s
+    # end of list_available_ports function
 
     def init(self):
         ''' Connect with comprehensive error handling '''
@@ -100,7 +109,16 @@ class RadioWorker(QThread):
             print("  - Driver installed")
         
         return False
+    # end of init function
 
+
+    '''
+    --------------------------------
+    |                              |
+    |      Get and Set Methods     |
+    |                              |
+    --------------------------------
+    '''
     def isActive(self):
         ''' Checks if the serial connection is active '''
         return self.serial
@@ -121,8 +139,3 @@ class RadioWorker(QThread):
         ''' Gets the COM port for the serial connection '''
         return self.port
     
-    @staticmethod
-    def clean_string(msg):
-        ''' Restituisce solo la parte utile di una stringaricevuta tramite connessione seriale '''
-        out = msg[2:][:-5]
-        return out
