@@ -1,18 +1,20 @@
-from PyQt6.QtWidgets import QWidget, QGridLayout
-from .customwidgets import BoxWidget
+from PyQt6.QtWidgets import QGridLayout, QWidget
+
+from .customwidgets import BoxWidget, MapWidget
+
 
 class Window(QWidget):
     def __init__(self, width, height):
-        ''' Main Window of the application '''
+        """Main Window of the application"""
         super().__init__()
         self.setWindowTitle("FSAE Base Station")
         self.setFixedSize(width, height)
-        
+
         # creation of the the text boxes using a dictionary
         # Important telemetry cards
         self.cards = {
             "ST": BoxWidget("Steering"),
-            "TP": BoxWidget("Throttle"),   
+            "TP": BoxWidget("Throttle"),
             "BS": BoxWidget("Brake"),
             "M": BoxWidget("Marcia"),
             "CS": BoxWidget("Clutch system"),
@@ -20,13 +22,13 @@ class Window(QWidget):
             "WT": BoxWidget("Water Temp"),
             "RPM": BoxWidget("RPM"),
             "OP": BoxWidget("Oil Pressure"),
-            "SS": BoxWidget("Status"),
+            "P": MapWidget(),
         }
 
         # Card Grid Layout
         grid = QGridLayout()
         grid.setSpacing(20)
-        
+
         # arranging the text boxes in a grid [N x 3]
         row = 0
         col = 0
@@ -37,24 +39,25 @@ class Window(QWidget):
                 row += 1
                 col = 0
         self.setLayout(grid)
+
     # end of __init__ function
 
-    
     def update_card(self, key, value):
-        ''' Function that updates the value of a specific card '''
-        if(key not in self.cards.keys()):
+        """Function that updates the value of a specific card"""
+        if key not in self.cards.keys():
             # if the received key is not in the dictionary we just return
             # hopefully this should not happen
             return
 
-        if(not value.isdigit()):
-            # here we print and set a default value if the received value is not valid 
-            print("/!\\ Value missing: keeping the previous one")
-            return
-        
         # debug print
         print("Received:", key, value)
-        self.cards[key].setValue(str(value))
-    # end of update_card function
 
-    
+        if (key == "P"):
+            if(len(value.split("-")) == 2):
+                lat = float(value.split("-")[0])
+                lon = float(value.split("-")[1])
+                self.cards[key].setPosition(lat, lon)
+        else:
+            self.cards[key].setValue(value)
+
+    # end of update_card function

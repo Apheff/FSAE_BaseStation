@@ -1,6 +1,10 @@
-from PyQt6.QtWidgets import QFrame, QVBoxLayout, QLabel
+from PyQt6.QtCore import Qt, QUrl
 from PyQt6.QtGui import QFont
-from PyQt6.QtCore import Qt
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtWidgets import QFrame, QLabel, QVBoxLayout
+
+import ui.server as server
+
 
 class BoxWidget(QFrame):
     def __init__(self, title, value="0"):
@@ -30,5 +34,31 @@ class BoxWidget(QFrame):
 
     def setValue(self, v):
         self.value_label.setText(str(v))
+
     # function that sets the value of the info widget
 
+
+class MapWidget(QFrame):
+    def __init__(self):
+        super().__init__()
+        self.resize(900, 600)
+
+        self.web = QWebEngineView(self)
+        self.web.resize(900, 600)
+
+        # URL del file HTML servito dal server
+        url = QUrl(f"http://localhost:{server.PORT}/ui/map.html")
+        self.web.load(url)
+
+        # Stato della pagina
+        self.page_is_ready = False
+        self.pending_position = None
+
+    def setPosition(self, lat, lon):
+        try:
+            lat = float(lat)
+            lon = float(lon)
+        except ValueError:
+            print("ERRORE: Latitudine o longitudine non numerica")
+            return
+        self.web.page().runJavaScript(f"setPosition({lat}, {lon});")
