@@ -3,8 +3,8 @@ import sys
 from PyQt6.QtWidgets import QApplication
 
 import ui.server
-from ui.serialwindow import SerialWindow
-from ui.window import Window
+from ui.serial_window import SerialWindow
+from ui.main_window import MainWindow
 from utils.radio import RadioWorker
 
 app = QApplication(sys.argv)
@@ -20,7 +20,8 @@ width = size.width()
 height = size.height()
 
 # GUI
-mainWindow = Window(width, height)
+mainWindow = MainWindow()
+mainWindow.showFullScreen()
 mainWindow.show()
 
 # Thread server

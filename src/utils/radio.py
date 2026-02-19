@@ -19,16 +19,16 @@ class RadioWorker(QThread):
 
         # Dictionary to store telemetry data (and pass it to the main window set function via signal)
         self.info = {
-            "ST": "",
-            "TP": "",
-            "BS": "",
-            "M": "",
-            "CS": "",
+            "S": "",
+            "T": "",
+            "B": "",
+            "G": "",
+            "C": "",
             "OT": "",
             "WT": "",
-            "RPM": "",
+            "R": "",
             "OP": "",
-            "SS": "",
+            "L": "",
         }
         self.start()
         # end of __init__ function
