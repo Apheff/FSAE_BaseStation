@@ -12,8 +12,8 @@ class BoxWidget(QWidget):
         self.setStyleSheet("""
             QWidget {
                 background-color: rgba(40, 40, 40, 170);
-                border-radius: 15px;
-                padding: 15px;
+                border-radius: 24px;
+                padding: 24px;
                 border: 1px solid rgba(150,150,150,60);
             }
             QLabel {
@@ -25,10 +25,10 @@ class BoxWidget(QWidget):
         title_label.setFont(QFont("Arial", 16, QFont.Weight.Bold))
         value_label = QLabel(value)
         value_label.setFont(QFont("Arial", 28, QFont.Weight.Bold))
-        value_label.setAlignment(Qt.AlignmentFlag.AlignRight)
 
-        layout.addWidget(title_label)
-        layout.addWidget(value_label)
+
+        layout.addWidget(title_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(value_label, alignment=Qt.AlignmentFlag.AlignCenter)
         self.value_label = value_label
         self.setLayout(layout)
 
@@ -118,7 +118,7 @@ class HistogramWidget(QWidget):
         """)
 
 class ImageWidget(QWidget):
-    def __init__(self, fileName):
+    def __init__(self, fileName, scaleW=100, scaleH=100):
         super().__init__()
 
         layout = QVBoxLayout(self)
@@ -130,14 +130,13 @@ class ImageWidget(QWidget):
         pixmap = QPixmap(fileName)
         self.label.setPixmap(
             pixmap.scaled(
-                100, 100,
+                scaleW, scaleH,
                 Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.TransformationMode.SmoothTransformation
             )
         )
 
         layout.addWidget(self.label)
-
 
 class TextWidget(QWidget):
     def __init__(self, title, value="0"):

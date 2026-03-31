@@ -5,7 +5,6 @@ from PyQt6.QtCore import QThread
 
 PORT = 8000
 
-
 class ReusableTCPServer(socketserver.TCPServer):
     allow_reuse_address = True  # evita "Address already in use"
 

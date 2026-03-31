@@ -44,7 +44,7 @@ class SerialWindow(QWidget):
     def get_selected_port(self):
         ''' Gets the selected port from the dropdown menu and initializes the radio '''
         self.radio.setCOM(self.postList.currentText().split(" : ")[0])
-        
+
         print(self.postList.currentText().split(" : ")[0] + " selected")
         
         if(self.radio.init()):

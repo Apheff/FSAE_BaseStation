@@ -35,12 +35,6 @@ class RadioWorker(QThread):
 
     def run(self):
         """Main thread loop to read data from the serial port"""
-        try:
-            self.serial = pyserial.Serial(self.port, self.baudrate, timeout=0.1)
-        except Exception as e:
-            print(f"Serial error: {e}")
-            return
-
         while self.running:
             try:
                 if self.serial:
@@ -91,7 +85,7 @@ class RadioWorker(QThread):
     def init(self):
         """Connect with comprehensive error handling"""
         try:
-            self.serial = pyserial.Serial(self.port, self.baudrate, timeout=10)
+            self.serial = pyserial.Serial(self.port, self.baudrate)
             self.start()
             return self.serial
 
@@ -133,7 +127,7 @@ class RadioWorker(QThread):
 
     def setCOM(self, port):
         """Sets the COM port for the serial connection"""
-        self.port = port
+        self.port = f"{port}"
 
     def getCOM(self):
         """Gets the COM port for the serial connection"""

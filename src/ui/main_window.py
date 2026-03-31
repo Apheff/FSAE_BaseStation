@@ -12,10 +12,10 @@ class MainWindow(QWidget):
         # creation of the the text boxes using a dictionary
         # Important telemetry cards
         self.cards = {
-            "B": HistogramWidget("Brake"),
-            "T": HistogramWidget("Throttle"),
-            "C": HistogramWidget("Clutch"),
-            "S": GaugeWidget(-180, 180, "Steering"),
+            "B": HistogramWidget("Brake", color= "#00FF00"),
+            "T": HistogramWidget("Throttle", color= "#FFFFFF"),
+            "C": HistogramWidget("Clutch", color= "#FF0000"),
+            "S": GaugeWidget(0, 180, "Steering"),
             "G": BoxWidget("Gear"),
             "OT": TextWidget("Oil Temp"),
             "WT": TextWidget("Water Temp"),
@@ -26,6 +26,14 @@ class MainWindow(QWidget):
 
         main_layout = QVBoxLayout()
         main_layout.setSpacing(10)
+
+        # ---- LOGO ----
+        logo_row = QHBoxLayout()
+        logo_row.addStretch()  # add stretch to center the logo
+
+
+        logo_row.addWidget(ImageWidget("assets/logo.png", scaleW=200, scaleH=100))
+        main_layout.addLayout(logo_row)
 
         # ---- ROW 1 ----
         row1 = QHBoxLayout()
@@ -67,14 +75,20 @@ class MainWindow(QWidget):
             # if the received key is not in the dictionary we just return
             # hopefully this should not happen
             return
+        
+
+        if(not value.isnumeric() and key not in ["L", "G"]):  # if the value is not numeric and the card is not the map or the gear box, we just
+            return
+        elif(value.isnumeric()):
+            value = int(value)
 
         # debug print
         print("Received:", key, value)
 
-        if (key == "P"):
+        if (key == "L"):
             if(len(value.split("-")) == 2):
-                lat = float(value.split("-")[0])
-                lon = float(value.split("-")[1])
+                lat = value.split("-")[0]
+                lon = value.split("-")[1]
                 self.cards[key].setPosition(lat, lon)
         else:
             self.cards[key].setValue(value)
